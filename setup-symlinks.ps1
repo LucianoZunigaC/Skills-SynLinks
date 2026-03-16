@@ -25,9 +25,24 @@ foreach ($link in $links) {
     if (-not (Test-Path $dir)) {
         New-Item -ItemType Directory -Path $dir -Force | Out-Null
     }
+    # Si ya existe (enlace roto por Git o anterior), quitarlo para crear uno que funcione en Explorer
     if (Test-Path $link.Path) {
-        Write-Host "Ya existe: $($link.Path)" -ForegroundColor Yellow
-        continue
+        try {
+            $item = Get-Item $link.Path -Force -ErrorAction Stop
+            $isLink = ($item.LinkType -eq 'SymbolicLink') -or ($item.LinkType -eq 'Junction') -or
+                      (([System.IO.FileAttributes]::ReparsePoint -band $item.Attributes) -eq [System.IO.FileAttributes]::ReparsePoint)
+            if ($isLink) {
+                Remove-Item -LiteralPath $link.Path -Force -ErrorAction Stop
+                Write-Host "Eliminado enlace anterior: $($link.Path)" -ForegroundColor Yellow
+            } else {
+                Write-Host "Ya existe (no es enlace): $($link.Path)" -ForegroundColor Yellow
+                continue
+            }
+        } catch {
+            Write-Host "No se pudo eliminar $($link.Path): $_" -ForegroundColor Red
+            Write-Host "Ejecuta PowerShell como Administrador o activa Modo desarrollador." -ForegroundColor Cyan
+            continue
+        }
     }
     try {
         New-Item -ItemType SymbolicLink -Path $link.Path -Target $link.Target | Out-Null

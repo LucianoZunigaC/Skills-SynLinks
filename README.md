@@ -39,6 +39,84 @@ Los symlinks son estándar de Git: si el repo **ya incluye** los enlaces (creado
 
 Cualquier cambio en `.skills/` se refleja en `.claude/skills`, `.cursor/skills`, etc., porque son enlaces al mismo contenido (en todos los sistemas).
 
+---
+
+## Windows: paso a paso (git clone y symlinks listos)
+
+Sigue estos pasos para clonar en Windows y dejar los enlaces simbólicos funcionando. Así, cuando edites algo en `.skills/`, se actualizará solo en ese sitio y el resto de carpetas (`.claude/skills`, `.cursor/skills`, etc.) lo verán automáticamente.
+
+### 1. Activar soporte de symlinks en Git (una vez por equipo)
+
+Abre **PowerShell** o **CMD** y ejecuta:
+
+```powershell
+git config --global core.symlinks true
+```
+
+Así Git no convertirá los enlaces en copias al clonar.
+
+### 2. Dar permiso a Windows para crear symlinks (elegir una opción)
+
+- **Opción A – Modo desarrollador (recomendado):**  
+  **Configuración** → **Privacidad y seguridad** → **Para desarrolladores** → activar **Modo de desarrollador**.  
+  No necesitas volver a hacer esto para cada clone.
+
+- **Opción B – Sin Modo desarrollador:**  
+  Abre PowerShell **como administrador** (clic derecho → “Ejecutar como administrador”) cuando vayas a clonar o cuando ejecutes el script del paso 4.
+
+### 3. Clonar el repositorio
+
+En la carpeta donde quieras el proyecto (por ejemplo `Documents` o `Proyectos`):
+
+```powershell
+cd C:\Users\TuUsuario\Documents
+git clone https://github.com/LucianoZunigaC/Skills-SynLinks.git
+cd Skills-SynLinks
+```
+
+Sustituye `TuUsuario` por tu usuario de Windows si hace falta.
+
+### 4. Si los symlinks no se crearon al clonar, ejecutar el script
+
+Comprueba si ya existen los enlaces:
+
+```powershell
+   Get-Item .claude\skills | Select-Object LinkType, Target
+```
+
+Si ves `LinkType: SymbolicLink` y `Target` apuntando a `.skills`, ya están listos y puedes saltar al paso 5.
+
+Si no existen o son carpetas normales (no enlaces), en la raíz del repo (`Skills-SynLinks`) ejecuta:
+
+```powershell
+.\setup-symlinks.ps1
+```
+
+- Con **Modo desarrollador** activado: abre PowerShell normal.  
+- Sin Modo desarrollador: abre PowerShell **como administrador**.
+
+**Si `skills` aparece como ".symlink" o no puedes abrirlo en el Explorador:** el enlace que creó Git al clonar a veces no funciona como carpeta en Windows. En la raíz del repo, ejecuta `.\setup-symlinks.ps1` (como administrador o con Modo desarrollador). El script quita ese enlace y crea uno nuevo que sí se puede abrir y que refleja los cambios de `.skills/`.
+
+### 5. Comprobar que todo funciona
+
+- Entra en `.skills\create-rule\` y abre `SKILL.md`, cambia una línea y guarda.
+- Abre `.claude\skills\create-rule\SKILL.md` (o `.cursor\skills\create-rule\SKILL.md`).  
+  Debe mostrar **el mismo cambio** sin hacer nada más.
+
+Si es así, los symlinks están bien: **solo editas en `.skills/` y las demás carpetas se actualizan solas**.
+
+### Resumen rápido (Windows)
+
+| Paso | Qué hacer |
+|------|-----------|
+| 1 | `git config --global core.symlinks true` |
+| 2 | Activar Modo desarrollador **o** usar PowerShell como Admin cuando haga falta |
+| 3 | `git clone ...` y `cd Skills-SynLinks` |
+| 4 | Si no hay enlaces: `.\setup-symlinks.ps1` |
+| 5 | Editar solo en `.skills/`; el resto se actualiza solo |
+
+---
+
 ## Después de clonar: asegurar los symlinks
 
 ### Linux / macOS / WSL / Git Bash
