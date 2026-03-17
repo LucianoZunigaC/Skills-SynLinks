@@ -73,7 +73,7 @@ async def list_active(self) -> list[Form]:
     stmt = (
         select(Form)
         .filter(Form.status == 'A')
-        .order_by(Form.xd_creation)  # Orden estándar AKI
+        .order_by(Form.xd_creation)
     )
     result = await self._session.execute(stmt)
     return list(result.scalars().all())
