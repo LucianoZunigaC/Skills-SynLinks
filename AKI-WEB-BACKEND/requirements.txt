@@ -1,0 +1,41 @@
+# FastAPI and Core Dependencies
+fastapi
+uvicorn
+anyio
+pydantic
+pydantic-settings
+orjson
+python-multipart
+pyjwt[crypto]
+pwdlib[argon2]
+email-validator
+
+# Database and ORM
+SQLAlchemy
+aioodbc
+pyodbc
+greenlet
+
+# HTTP Clients and File Handling
+httpx
+aiohttp
+aiofiles
+python-dotenv
+
+# Data Processing and Excel
+pandas
+openpyxl
+xlsxwriter
+
+# Azure Cloud Integration
+azure-storage-blob
+azure-identity
+cryptography
+
+# Testing and Development Tools
+faker
+
+# Monitoring and Observability
+asgi-correlation-id
+opentelemetry-instrumentation-fastapi
+opentelemetry-instrumentation-sqlalchemy

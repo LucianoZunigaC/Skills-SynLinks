@@ -1,0 +1,42 @@
+# Python to Linux Web App on Azure
+# Build your Python project and deploy it to Azure as a Linux Web App.
+# https://aka.ms/yaml
+
+trigger:
+  - none
+
+parameters:
+  - name: variableGroupName
+    displayName: Variable Group Name
+    type: string
+    default: eastus-rg-dev-name-001
+    values:
+    - eastus-rg-dev-name-001
+    - eastus-rg-sbx-aki-01
+
+  - name: webAppName
+    displayName: Web App Name
+    type: string
+    values:
+      - eastus-api-dev-dante-001
+      - eastus-api-sbx-aki-01
+
+resources:
+  repositories:
+    - repository: IAC
+      type: git
+      name: IAC
+
+variables:
+  - group: ${{ parameters.variableGroupName }}
+
+stages:
+    - template: templates/Az.Web/deploy-to-linux-webapp-on-azure-async.yml@IAC
+      parameters:
+        ConnectedServiceNameARM: '$(ConnectedServiceName)'
+        ResourceGroupName: '$(ResourceGroupName)'
+        WebAppName: '${{ parameters.webAppName }}'
+        EnvironmentName: dev # O puedes pasar el appName como environment si lo deseas
+        RuntimeStack: 'PYTHON|3.12'
+        # WorkingDirectory: $(System.DefaultWorkingDirectory) # Si necesitas sobrescribir el valor por defecto
+        StartUpCommand: 'python -m uvicorn src.main:app --host 0.0.0.0 --workers $((($NUM_CORES*2)+1))'
