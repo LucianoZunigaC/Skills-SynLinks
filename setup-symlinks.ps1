@@ -25,20 +25,16 @@ foreach ($link in $links) {
     if (-not (Test-Path $dir)) {
         New-Item -ItemType Directory -Path $dir -Force | Out-Null
     }
-    # Si ya existe (enlace roto por Git o anterior), quitarlo para crear uno que funcione en Explorer
+    # Si ya existe: quitarlo para crear el symlink (Git en Windows suele crear archivo o carpeta placeholder)
     if (Test-Path $link.Path) {
         try {
-            $item = Get-Item $link.Path -Force -ErrorAction Stop
-            $isLink = ($item.LinkType -eq 'SymbolicLink') -or ($item.LinkType -eq 'Junction') -or
-                      (([System.IO.FileAttributes]::ReparsePoint -band $item.Attributes) -eq [System.IO.FileAttributes]::ReparsePoint)
-            if ($isLink) {
-                Remove-Item -LiteralPath $link.Path -Force -ErrorAction Stop
-                Write-Host "Eliminado enlace anterior: $($link.Path)" -ForegroundColor Yellow
-            } else {
-                Write-Host "Ya existe (no es enlace): $($link.Path)" -ForegroundColor Yellow
+            Remove-Item -LiteralPath $link.Path -Force -ErrorAction Stop
+            Write-Host "Eliminado: $($link.Path)" -ForegroundColor Yellow
+        } catch {
+            if ($_.Exception.Message -match "no está vacío|not empty|directory") {
+                Write-Host "Omitido (carpeta con contenido): $($link.Path)" -ForegroundColor Yellow
                 continue
             }
-        } catch {
             Write-Host "No se pudo eliminar $($link.Path): $_" -ForegroundColor Red
             Write-Host "Ejecuta PowerShell como Administrador o activa Modo desarrollador." -ForegroundColor Cyan
             continue
