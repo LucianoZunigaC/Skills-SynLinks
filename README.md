@@ -95,7 +95,7 @@ Si no existen o son carpetas normales (no enlaces), ejecuta el script con **una*
 cd C:\ruta\a\Skills-SynLinks
 .\setup-symlinks.ps1
 
-# Opción B — desde dentro de AKI-WEB-BACKEND (hay un script que llama al de la raíz)
+# Opción B — desde dentro de AKI-WEB-BACKEND (script autónomo, recomendado)
 cd C:\ruta\a\Skills-SynLinks\AKI-WEB-BACKEND
 .\setup-symlinks.ps1
 
