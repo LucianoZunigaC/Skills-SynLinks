@@ -1,15 +1,15 @@
-# Script para crear los enlaces simbólicos (symlinks) de skills.
-# Ejecutar desde la raíz del repo (carpeta Skills o Skills-SynLinks).
+# Script para crear los enlaces simbólicos de skills dentro de AKI-WEB-BACKEND.
+# Ejecutar desde la raíz del monorepo (donde está esta carpeta y AKI-WEB-BACKEND).
 #
-# En Windows: puede requerir "Ejecutar como administrador" O activar
-# Modo desarrollador: Configuración > Privacidad y seguridad > Para desarrolladores > Modo de desarrollador
+# Windows: PowerShell como Administrador o Modo desarrollador activado.
 
 $ErrorActionPreference = "Stop"
-$repoRoot = $PSScriptRoot
-$target = Join-Path $repoRoot "AKI-WEB-BACKEND\.skills"
+$monorepoRoot = $PSScriptRoot
+$repoRoot = Join-Path $monorepoRoot "AKI-WEB-BACKEND"
+$target = Join-Path $repoRoot ".skills"
 
 if (-not (Test-Path $target)) {
-    Write-Error "No se encuentra la carpeta AKI-WEB-BACKEND\.skills en $repoRoot"
+    Write-Error "No se encuentra la carpeta .skills en $repoRoot"
     exit 1
 }
 
@@ -25,7 +25,6 @@ foreach ($link in $links) {
     if (-not (Test-Path $dir)) {
         New-Item -ItemType Directory -Path $dir -Force | Out-Null
     }
-    # Si ya existe: quitarlo para crear el symlink (Git en Windows suele crear archivo o carpeta placeholder)
     if (Test-Path $link.Path) {
         try {
             Remove-Item -LiteralPath $link.Path -Force -ErrorAction Stop
@@ -45,8 +44,9 @@ foreach ($link in $links) {
         Write-Host "Creado: $($link.Path) -> $($link.Target)" -ForegroundColor Green
     } catch {
         Write-Host "Error creando $($link.Path): $_" -ForegroundColor Red
-        Write-Host "Prueba: 1) Ejecutar PowerShell como Administrador, o 2) Activar Modo desarrollador en Windows." -ForegroundColor Cyan
+        Write-Host "Prueba: PowerShell como Administrador o Modo desarrollador." -ForegroundColor Cyan
     }
 }
 
-Write-Host "`nListo. Comprueba con: Get-ChildItem -Force .claude, .cursor, .codex, .github" -ForegroundColor Cyan
+Write-Host "`nListo. Skills en AKI-WEB-BACKEND\.skills; enlaces en AKI-WEB-BACKEND\.claude\skills, etc." -ForegroundColor Cyan
+Write-Host "Nota: abre la carpeta AKI-WEB-BACKEND como raíz del workspace en Cursor para que use .cursor/skills." -ForegroundColor Cyan

@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Crea enlaces simbólicos para que .claude/skills, .cursor/skills, etc. apunten a .skills
-# Uso: ejecutar desde la raíz del repo (Linux, macOS, WSL, Git Bash)
-# Ejemplo: ./setup-symlinks.sh  o  bash setup-symlinks.sh
+# Crea symlinks dentro de AKI-WEB-BACKEND: .claude/skills, .cursor/skills, etc. -> .skills
+# Ejecutar desde la raíz del monorepo (donde está este script y la carpeta AKI-WEB-BACKEND).
 
 set -e
-REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
-TARGET="$REPO_ROOT/AKI-WEB-BACKEND/.skills"
+MONOREPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$MONOREPO_ROOT/AKI-WEB-BACKEND"
+TARGET="$REPO_ROOT/.skills"
 
 if [ ! -d "$TARGET" ]; then
-  echo "Error: no se encuentra la carpeta AKI-WEB-BACKEND/.skills en $REPO_ROOT" >&2
+  echo "Error: no se encuentra $TARGET" >&2
   exit 1
 fi
 
@@ -25,4 +25,4 @@ for dir in .claude .cursor .codex .github; do
 done
 
 echo ""
-echo "Listo. Comprueba con: ls -la .claude .cursor .codex .github"
+echo "Listo. Abre AKI-WEB-BACKEND como raíz del workspace en Cursor para usar .cursor/skills."

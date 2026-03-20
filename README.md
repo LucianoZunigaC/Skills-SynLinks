@@ -1,6 +1,8 @@
 # Skills-SynLinks
 
-Repositorio de **Agent Skills** compartidas con una sola fuente de verdad en **`AKI-WEB-BACKEND/.skills/`** y enlaces simbólicos en la raíz (`.claude/skills`, `.cursor/skills`, etc.) para que cada agente lea desde la carpeta que espera.
+Repositorio monorepo: el backend y las **Agent Skills** viven dentro de **`AKI-WEB-BACKEND/`**. La fuente única de skills es **`AKI-WEB-BACKEND/.skills/`**; dentro del mismo backend, **`.claude/skills`**, **`.cursor/skills`**, **`.codex/skills`** y **`.github/skills`** son enlaces simbólicos a esa carpeta.
+
+**Cursor / IDEs:** para que el agente cargue las skills del proyecto, abre **`AKI-WEB-BACKEND`** como **carpeta raíz del workspace** (no solo el monorepo padre).
 
 
 ## ¿Funciona en todos los sistemas?
@@ -17,31 +19,33 @@ Los symlinks son estándar de Git: si el repo **ya incluye** los enlaces (creado
 
 ```
 ├── AKI-WEB-BACKEND/
-│   └── .skills/                 # ← Fuente única: edita solo aquí
-│       ├── database-interaction/
-│       ├── repo-documentation/
-│       ├── repo-rules/
-│       └── stored-procedures/
-├── .claude/
-│   └── skills   → symlink a ../AKI-WEB-BACKEND/.skills
-├── .cursor/
-│   └── skills   → symlink a ../AKI-WEB-BACKEND/.skills
-├── .codex/
-│   └── skills   → symlink a ../AKI-WEB-BACKEND/.skills
-├── .github/
-│   └── skills   → symlink a ../AKI-WEB-BACKEND/.skills
-├── setup-symlinks.sh            # Linux, macOS, WSL, Git Bash
-├── setup-symlinks.ps1           # Windows (PowerShell)
+│   ├── .skills/                 # ← Fuente única: edita solo aquí
+│   │   ├── database-interaction/
+│   │   ├── repo-documentation/
+│   │   ├── repo-rules/
+│   │   └── stored-procedures/
+│   ├── .claude/
+│   │   └── skills   → symlink a ../.skills
+│   ├── .cursor/
+│   │   └── skills   → symlink a ../.skills
+│   ├── .codex/
+│   │   └── skills   → symlink a ../.skills
+│   ├── .github/
+│   │   └── skills   → symlink a ../.skills
+│   ├── src/                     # código FastAPI
+│   └── ...
+├── setup-symlinks.sh            # Ejecutar desde la raíz del monorepo
+├── setup-symlinks.ps1
 └── README.md
 ```
 
-Cualquier cambio en `AKI-WEB-BACKEND/.skills/` se refleja en `.claude/skills`, `.cursor/skills`, etc., porque son enlaces al mismo contenido (en todos los sistemas).
+Cualquier cambio en `AKI-WEB-BACKEND/.skills/` se refleja en `AKI-WEB-BACKEND/.claude/skills`, `.cursor/skills`, etc., porque son enlaces al mismo contenido.
 
 ---
 
 ## Windows: paso a paso (git clone y symlinks listos)
 
-Sigue estos pasos para clonar en Windows y dejar los enlaces simbólicos funcionando. Así, cuando edites algo en `AKI-WEB-BACKEND/.skills/`, se actualizará solo en ese sitio y el resto de carpetas (`.claude/skills`, `.cursor/skills`, etc.) lo verán automáticamente.
+Sigue estos pasos para clonar en Windows y dejar los enlaces simbólicos funcionando. Así, cuando edites algo en `AKI-WEB-BACKEND/.skills/`, el resto de carpetas de agentes **dentro del backend** lo verán automáticamente.
 
 ### 1. Activar soporte de symlinks en Git (una vez por equipo)
 
@@ -79,10 +83,10 @@ Sustituye `TuUsuario` por tu usuario de Windows si hace falta.
 Comprueba si ya existen los enlaces:
 
 ```powershell
-   Get-Item .claude\skills | Select-Object LinkType, Target
+Get-Item AKI-WEB-BACKEND\.claude\skills | Select-Object LinkType, Target
 ```
 
-Si ves `LinkType: SymbolicLink` y `Target` apuntando a `AKI-WEB-BACKEND\.skills`, ya están listos y puedes saltar al paso 5.
+Si ves `LinkType: SymbolicLink` y el destino apunta a `.skills` del backend, ya están listos y puedes saltar al paso 5.
 
 Si no existen o son carpetas normales (no enlaces), en la raíz del repo (`Skills-SynLinks`) ejecuta:
 
@@ -93,12 +97,12 @@ Si no existen o son carpetas normales (no enlaces), en la raíz del repo (`Skill
 - Con **Modo desarrollador** activado: abre PowerShell normal.  
 - Sin Modo desarrollador: abre PowerShell **como administrador**.
 
-**Si `skills` aparece como ".symlink" o no puedes abrirlo en el Explorador:** el enlace que creó Git al clonar a veces no funciona como carpeta en Windows. En la raíz del repo, ejecuta `.\setup-symlinks.ps1` (como administrador o con Modo desarrollador). El script quita ese enlace y crea uno nuevo que apunta a `AKI-WEB-BACKEND\.skills`.
+**Si `skills` aparece como archivo o no puedes abrirlo:** en la raíz del monorepo ejecuta `.\setup-symlinks.ps1` (como administrador o con Modo desarrollador). El script recrea los enlaces dentro de `AKI-WEB-BACKEND`.
 
 ### 5. Comprobar que todo funciona
 
 - Entra en `AKI-WEB-BACKEND\.skills\repo-rules\` y abre `SKILL.md`, cambia una línea y guarda.
-- Abre `.claude\skills\repo-rules\SKILL.md` (o `.cursor\skills\repo-rules\SKILL.md`).  
+- Abre `AKI-WEB-BACKEND\.claude\skills\repo-rules\SKILL.md` (o `AKI-WEB-BACKEND\.cursor\skills\repo-rules\SKILL.md`).  
   Debe mostrar **el mismo cambio** sin hacer nada más.
 
 Si es así, los symlinks están bien: **solo editas en `AKI-WEB-BACKEND/.skills/` y las demás carpetas se actualizan solas**.
@@ -155,7 +159,7 @@ Para que **al hacer `git clone` los symlinks vengan creados** donde el sistema l
 2. **Guardarlos en Git** (si tu Git tiene symlinks activos):
    ```bash
    git config core.symlinks true
-   git add .claude/skills .cursor/skills .codex/skills .github/skills
+   git add AKI-WEB-BACKEND/.claude/skills AKI-WEB-BACKEND/.cursor/skills AKI-WEB-BACKEND/.codex/skills AKI-WEB-BACKEND/.github/skills
    git commit -m "Añadir symlinks de skills"
    git push
    ```
