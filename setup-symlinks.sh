@@ -5,10 +5,10 @@
 
 set -e
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
-TARGET="$REPO_ROOT/.skills"
+TARGET="$REPO_ROOT/AKI-WEB-BACKEND/.skills"
 
 if [ ! -d "$TARGET" ]; then
-  echo "Error: no se encuentra la carpeta .skills en $REPO_ROOT" >&2
+  echo "Error: no se encuentra la carpeta AKI-WEB-BACKEND/.skills en $REPO_ROOT" >&2
   exit 1
 fi
 

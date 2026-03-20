@@ -24,3 +24,7 @@ uvicorn src.main:app --reload
 - **SQLAlchemy** para ORM
 - **OAuth2 + JWT** para autenticación
 - **Azure Blob Storage** para archivos
+
+## 📁 Agent Skills (en este repo)
+
+Las skills del proyecto están en **`.skills/`** (dentro de esta carpeta `AKI-WEB-BACKEND`). En la raíz del monorepo, `.claude/skills`, `.cursor/skills`, etc. son **enlaces simbólicos** a `AKI-WEB-BACKEND/.skills`: edita solo ahí y los agentes verán los mismos archivos.

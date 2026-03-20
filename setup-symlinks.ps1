@@ -6,10 +6,10 @@
 
 $ErrorActionPreference = "Stop"
 $repoRoot = $PSScriptRoot
-$target = Join-Path $repoRoot ".skills"
+$target = Join-Path $repoRoot "AKI-WEB-BACKEND\.skills"
 
 if (-not (Test-Path $target)) {
-    Write-Error "No se encuentra la carpeta .skills en $repoRoot"
+    Write-Error "No se encuentra la carpeta AKI-WEB-BACKEND\.skills en $repoRoot"
     exit 1
 }
 
