@@ -1,17 +1,65 @@
-# Script para crear los enlaces simbólicos de skills dentro de AKI-WEB-BACKEND.
-# Ejecutar desde la raíz del monorepo (donde está esta carpeta y AKI-WEB-BACKEND).
+# Crea symlinks: AKI-WEB-BACKEND\.claude\skills, .cursor\skills, etc. -> AKI-WEB-BACKEND\.skills
 #
-# Windows: PowerShell como Administrador o Modo desarrollador activado.
+# Funciona aunque ejecutes desde otra carpeta: usa la ubicación del script, el directorio actual o -MonorepoRoot.
+# Windows: PowerShell como Administrador o Modo desarrollador.
+
+param(
+    # Raíz del monorepo (carpeta que contiene AKI-WEB-BACKEND). Si no la pasas, se detecta sola.
+    [string]$MonorepoRoot = ""
+)
 
 $ErrorActionPreference = "Stop"
-$monorepoRoot = $PSScriptRoot
+
+function Test-MonorepoRoot([string]$Path) {
+    $skills = Join-Path $Path "AKI-WEB-BACKEND\.skills"
+    return (Test-Path $skills)
+}
+
+# 1) Parámetro explícito
+$resolved = $null
+if ($MonorepoRoot) {
+    $resolved = (Resolve-Path -LiteralPath $MonorepoRoot).Path
+    if (-not (Test-MonorepoRoot $resolved)) {
+        Write-Error "En '$resolved' no existe AKI-WEB-BACKEND\.skills. Revisa -MonorepoRoot."
+        exit 1
+    }
+}
+# 2) Script en la raíz del monorepo (junto a AKI-WEB-BACKEND)
+elseif (Test-MonorepoRoot $PSScriptRoot) {
+    $resolved = $PSScriptRoot
+}
+# 3) Script copiado dentro de AKI-WEB-BACKEND (misma carpeta que .skills)
+elseif ((Test-Path (Join-Path $PSScriptRoot ".skills")) -and (Test-Path (Join-Path $PSScriptRoot "src"))) {
+    $resolved = Split-Path $PSScriptRoot -Parent
+    if (-not (Test-MonorepoRoot $resolved)) {
+        Write-Error "No se pudo inferir el monorepo desde $($PSScriptRoot)"
+        exit 1
+    }
+}
+# 4) Directorio de trabajo actual es la raíz del monorepo
+elseif (Test-MonorepoRoot (Get-Location).Path) {
+    $resolved = (Get-Location).Path
+}
+else {
+    Write-Host "No se encontró AKI-WEB-BACKEND\.skills." -ForegroundColor Red
+    Write-Host ""
+    Write-Host "Opciones:" -ForegroundColor Yellow
+    Write-Host "  A) Ir a la raíz del repo (donde está la carpeta AKI-WEB-BACKEND) y ejecutar:" -ForegroundColor Cyan
+    Write-Host "     .\setup-symlinks.ps1" -ForegroundColor White
+    Write-Host "  B) Desde cualquier sitio, indicar la ruta:" -ForegroundColor Cyan
+    Write-Host "     & 'C:\ruta\al\repo\setup-symlinks.ps1' -MonorepoRoot 'C:\ruta\al\repo'" -ForegroundColor White
+    Write-Host "  C) Dentro de AKI-WEB-BACKEND usar el script pequeño:" -ForegroundColor Cyan
+    Write-Host "     .\setup-symlinks.ps1" -ForegroundColor White
+    Write-Host "     (el de esta carpeta llama al de la raíz)" -ForegroundColor Gray
+    exit 1
+}
+
+$monorepoRoot = $resolved
 $repoRoot = Join-Path $monorepoRoot "AKI-WEB-BACKEND"
 $target = Join-Path $repoRoot ".skills"
 
-if (-not (Test-Path $target)) {
-    Write-Error "No se encuentra la carpeta .skills en $repoRoot"
-    exit 1
-}
+Write-Host "Monorepo: $monorepoRoot" -ForegroundColor DarkGray
+Write-Host "Backend:  $repoRoot" -ForegroundColor DarkGray
 
 $links = @(
     @{ Path = Join-Path $repoRoot ".claude\skills"; Target = $target }
@@ -48,5 +96,4 @@ foreach ($link in $links) {
     }
 }
 
-Write-Host "`nListo. Skills en AKI-WEB-BACKEND\.skills; enlaces en AKI-WEB-BACKEND\.claude\skills, etc." -ForegroundColor Cyan
-Write-Host "Nota: abre la carpeta AKI-WEB-BACKEND como raíz del workspace en Cursor para que use .cursor/skills." -ForegroundColor Cyan
+Write-Host "`nListo. Abre AKI-WEB-BACKEND como workspace en Cursor para .cursor/skills." -ForegroundColor Cyan

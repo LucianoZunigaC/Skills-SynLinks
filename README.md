@@ -88,10 +88,19 @@ Get-Item AKI-WEB-BACKEND\.claude\skills | Select-Object LinkType, Target
 
 Si ves `LinkType: SymbolicLink` y el destino apunta a `.skills` del backend, ya están listos y puedes saltar al paso 5.
 
-Si no existen o son carpetas normales (no enlaces), en la raíz del repo (`Skills-SynLinks`) ejecuta:
+Si no existen o son carpetas normales (no enlaces), ejecuta el script con **una** de estas formas:
 
 ```powershell
+# Opción A — desde la raíz del monorepo (donde está la carpeta AKI-WEB-BACKEND)
+cd C:\ruta\a\Skills-SynLinks
 .\setup-symlinks.ps1
+
+# Opción B — desde dentro de AKI-WEB-BACKEND (hay un script que llama al de la raíz)
+cd C:\ruta\a\Skills-SynLinks\AKI-WEB-BACKEND
+.\setup-symlinks.ps1
+
+# Opción C — desde cualquier carpeta, con ruta explícita
+& "C:\ruta\a\Skills-SynLinks\setup-symlinks.ps1" -MonorepoRoot "C:\ruta\a\Skills-SynLinks"
 ```
 
 - Con **Modo desarrollador** activado: abre PowerShell normal.  
